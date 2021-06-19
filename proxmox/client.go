@@ -258,6 +258,24 @@ func (c *Client) GetStorageContent(vmr *VmRef, storageName string) (data map[str
 	return
 }
 
+// DeleteVolume - Delete volume
+func (c *Client) DeleteVolume(vmr *VmRef, storageName string, volumeId string) (exitStatus string, err error) {
+	err = c.CheckVmRef(vmr)
+	if err != nil {
+		return "", err
+	}
+	url := fmt.Sprintf("/nodes/%s/storage/%s/content/%s", vmr.node, storageName, volumeId)
+	resp, err := c.session.Delete(url, nil, nil)
+	if err == nil {
+		taskResponse, err := ResponseJSON(resp)
+		if err != nil {
+			return "", err
+		}
+		exitStatus, err = c.WaitForCompletion(taskResponse)
+	}
+	return
+}
+
 func (c *Client) GetVmSpiceProxy(vmr *VmRef) (vmSpiceProxy map[string]interface{}, err error) {
 	err = c.CheckVmRef(vmr)
 	if err != nil {
