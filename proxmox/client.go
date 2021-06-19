@@ -944,7 +944,9 @@ func (c *Client) AgentCommand(vmr *VmRef, command string, params map[string]inte
 	agentExecRes, err = ResponseJSON(resp)
 	if err == nil {
 		if agentExecRes != nil {
-			agentExecRes = agentExecRes["data"].(map[string]interface{})
+			if agentExecRes["data"] != nil {
+				agentExecRes = agentExecRes["data"].(map[string]interface{})
+			}
 		}
 	}
 	return
