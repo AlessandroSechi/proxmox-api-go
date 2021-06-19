@@ -1005,6 +1005,25 @@ func (c *Client) GetQemuIPSet(vmr *VmRef) (ipsets map[string]interface{}, err er
 	return
 }
 
+// AddQemuIPSet - Create new IPSet
+func (c *Client) AddQemuIPSet(vmr *VmRef, IPSetName string, params map[string]interface{}) (exitStatus interface{}, err error) {
+	err = c.CheckVmRef(vmr)
+	if err != nil {
+		return nil, err
+	}
+	reqbody := ParamsToBody(params)
+	url := fmt.Sprintf("/nodes/%s/qemu/%d/firewall/ipset/%s", vmr.node, vmr.vmId, IPSetName)
+	resp, err := c.session.Post(url, nil, nil, &reqbody)
+	if err == nil {
+		taskResponse, err := ResponseJSON(resp)
+		if err != nil {
+			return nil, err
+		}
+		exitStatus, err = c.WaitForCompletion(taskResponse)
+	}
+	return
+}
+
 // DeleteQemuIPSet - Delete IPSet
 func (c *Client) DeleteQemuIPSet(vmr *VmRef, IPSetName string) (exitStatus interface{}, err error) {
 	err = c.CheckVmRef(vmr)
