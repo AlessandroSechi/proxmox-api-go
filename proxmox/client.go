@@ -912,6 +912,25 @@ func (c *Client) GetExecStatus(vmr *VmRef, pid string) (status map[string]interf
 	return
 }
 
+// AgentCommand - Execute Qemu Guest Agent commands.
+func (c *Client) AgentCommand(vmr *VmRef, command string, params map[string]interface{}) (agentExecRes map[string]interface{}, err error) {
+	err = c.CheckVmRef(vmr)
+	if err != nil {
+		return nil, err
+	}
+	reqbody := ParamsToBody(params)
+	url := fmt.Sprintf("/nodes/%s/qemu/%d/agent/%s", vmr.node, vmr.vmId, command)
+	resp, err := c.session.Post(url, nil, nil, &reqbody)
+	if err != nil {
+		return nil, err
+	}
+	agentExecRes, err = ResponseJSON(resp)
+	if err == nil {
+		agentExecRes = agentExecRes["data"].(map[string]interface{})
+	}
+	return
+}
+
 // SetQemuFirewallOptions - Set Firewall options.
 func (c *Client) SetQemuFirewallOptions(vmr *VmRef, fwOptions map[string]interface{}) (exitStatus interface{}, err error) {
 	err = c.CheckVmRef(vmr)
