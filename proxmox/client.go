@@ -507,12 +507,11 @@ func (c *Client) DeleteVmParams(vmr *VmRef, params map[string]interface{}) (exit
 			}
 		}
 	}
-
-	reqbody := ParamsToBody(params)
 	url := fmt.Sprintf("/nodes/%s/%s/%d", vmr.node, vmr.vmType, vmr.vmId)
 	var taskResponse map[string]interface{}
-	if len(reqbody) != 0 {
-		_, err = c.session.RequestJSON("DELETE", url, nil, nil, &reqbody, &taskResponse)
+	if len(params) != 0 {
+		values := ParamsToValues(params)
+		_, err = c.session.RequestJSON("DELETE", url, &values, nil, nil, &taskResponse)
 	} else {
 		_, err = c.session.RequestJSON("DELETE", url, nil, nil, nil, &taskResponse)
 	}
